@@ -37,9 +37,10 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="96dp"
         android:text="说明文档：启动Service，选择类型，获取屏幕；切换类型后需要停止服务再重新初始化"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="92dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <Button
         android:layout_width="wrap_content"
