@@ -80,8 +80,7 @@ public class ScreenshotsService extends Service {
 
     private int type;
 
-    private int recordTotalSize = 60 * 3;
-    private int recordSize;//录制时长，单位秒
+
 
     static class MessageHandler extends Handler {
         ScreenshotsService service;
@@ -98,7 +97,7 @@ public class ScreenshotsService extends Service {
                     service.startCapture(msg);
                     break;
                 case START_RECORD_VIDEO:
-                    service.startRecord(msg);
+                    service.startRecord();
                     break;
                 case STOP_RECORD_VIDEO:
                     service.stopRecord(msg);
@@ -289,50 +288,20 @@ public class ScreenshotsService extends Service {
      * 开始录制
      * mediaRecorder  每次录制完毕后再次录制需要重新初始化所有参数，，暂时无解
      *
-     * @param msg
      */
 
-    public void startRecord(Message msg) {
+    public void startRecord() {
         if (!recordRun) {
             virtualDisplay();
             mediaRecorder.start();
             recordRun = true;
             Log.d(TAG, "开始录制");
-            recordSize = 0;
-            recordTimer(msg);//启动计时器
+
         } else {
             Log.d(TAG, "录制进行中");
         }
     }
 
-    /**
-     * 计时器
-     *
-     * @param msg
-     */
-    private void recordTimer(final Message msg) {
-        final Message toClient = Message.obtain(msg);
-        toClient.what = RECORD_TIMER;
-        final Handler handler = new Handler();
-        Runnable runnable = new Runnable() {
-            @Override
-            public void run() {
-                if (recordRun) {
-                    if (recordSize >= recordTotalSize)//录制满时长则退出
-                    {
-                        stopRecord(msg);//停止录制
-                        return;
-                    }
-                    toClient.arg1 = recordSize;
-//                        msg.replyTo.send(toClient);
-                    Log.d(TAG, "录制中 time：" + recordSize + "总时长：" + recordTotalSize);
-                    recordSize++;
-                    handler.postDelayed(this, 1000);
-                }
-            }
-        };
-        handler.post(runnable);
-    }
 
 
     private void startCapture(Message msg) {

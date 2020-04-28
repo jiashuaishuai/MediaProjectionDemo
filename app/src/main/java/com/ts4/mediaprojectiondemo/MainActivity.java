@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -91,13 +92,13 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void recordVideo(View view) {
-
         sendMessage(ScreenshotsService.START_RECORD_VIDEO);
-
+        recordTimer();
     }
 
     public void stopRecordVideo(View view) {
         sendMessage(ScreenshotsService.STOP_RECORD_VIDEO);
+        Countdown.removeCallbacks(CountdownRun);
     }
 
 
@@ -161,6 +162,8 @@ public class MainActivity extends AppCompatActivity {
             } catch (RemoteException e) {
                 e.printStackTrace();
             }
+        } else {
+            Toast.makeText(this, "意外终止", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -225,6 +228,33 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+    }
+
+    Handler Countdown = new Handler();
+    Runnable CountdownRun;
+    private int recordTotalSize = 60 * 3;
+    private int recordSize;//录制时长，单位秒
+
+    /**
+     * 计时器
+     */
+    private void recordTimer() {
+        recordSize = 0;
+        CountdownRun = new Runnable() {
+            @Override
+            public void run() {
+                if (recordSize >= recordTotalSize)//录制满时长则退出
+                {
+                    stopRecordVideo(null);//停止录制
+                    return;
+                }
+
+                Log.d(TAG, "录制中 time：" + recordSize + "总时长：" + recordTotalSize);
+                recordSize++;
+                Countdown.postDelayed(this, 1000);
+            }
+        };
+        Countdown.post(CountdownRun);
     }
 
 }
